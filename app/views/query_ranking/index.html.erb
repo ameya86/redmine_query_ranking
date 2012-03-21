@@ -1,0 +1,28 @@
+<h2><%= @query.new_record? ? l(:label_query_ranking) : h(@query.name) %></h2>
+
+<%= render :partial => 'query_ranking/filter' %>
+
+<% if @issue_count_by_group %>
+<table class="list" style="width: 100%">
+<thead>
+  <th style="width: 30px; text-align: right;"></th>
+  <th style="width: 30%;"><%= @query.group_by_column.caption %></th>
+  <th><%= l(:label_match_issue_count) %></th>
+</thead>
+<tbody>  
+<% @issue_count_by_group.to_a.sort{|a, b| b.last <=> a.last}.each_with_index do |group_count, index| %>
+  <tr>
+    <td><%= h(index + 1) %>.</td>
+    <td><%= group_count.first.to_s %></td>
+    <td><%= progress_bar(100 * group_count.last / @max_count, {:width => '90%;', :legend => group_count.last}) %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+
+<% content_for :sidebar do %>
+  <%= render :partial => 'query_ranking/sidebar' %>
+<% end %>
+
+<% html_title(l(:label_query_ranking)) %>

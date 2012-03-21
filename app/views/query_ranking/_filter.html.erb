@@ -1,0 +1,31 @@
+<% form_tag({ :controller => 'query_ranking', :action => 'index'}, :method => :get, :id => 'query_form') do %>
+    <%= hidden_field_tag 'set_filter', '1' %>
+    <div id="query_form_content" class="hide-when-print">
+    <fieldset id="filters" class="collapsible <%= @query.new_record? ? "" : "collapsed" %>">
+      <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+      <div style="<%= @query.new_record? ? "" : "display: none;" %>">
+        <%= render :partial => 'queries/filters', :locals => {:query => @query} %>
+      </div>
+      <div>
+        <table>
+          <tr style="display: none;">
+            <td><%= l(:field_column_names) %></td>
+            <td><%= render :partial => 'queries/columns', :locals => {:query => @query} %></td>
+          </tr>
+          <tr>
+            <td style="width: 200px;"><label for='group_by'><%= l(:field_group_by) %></label></td>
+            <td><%= select_tag('group_by', options_for_select([[]] + @query.groupable_columns.collect {|c| [c.caption, c.name.to_s]}, @query.group_by)) %></td>
+          </tr>
+        </table>
+      </div>
+    </fieldset>
+    </div>
+    <p class="buttons hide-when-print">
+
+    <%= link_to_function l(:button_apply), 'submit_query_form("query_form")', :class => 'icon icon-checked' %>
+    <%= link_to l(:button_clear), { :set_filter => 1, :project_id => @project }, :class => 'icon icon-reload'  %>
+    <% if @query.new_record? && User.current.allowed_to?(:save_queries, @project, :global => true) %>
+        <%= link_to_function l(:button_save), "$('query_form').action='#{ @project ? new_project_query_path : new_query_path }'; submit_query_form('query_form')", :class => 'icon icon-save' %>
+    <% end %>
+    </p>
+<% end %>
